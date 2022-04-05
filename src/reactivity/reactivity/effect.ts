@@ -1,39 +1,41 @@
 class ReactiveEffect {
-    private _fn:any
-    constructor (fn){
+    private _fn: any
+    constructor(fn) {
         this._fn = fn
     }
-    run(){
+    run() {
         activeEffect = this
-        this._fn();
+        return this._fn();
     }
 }
 const targetMap = new Map();
-export function  track(target,key){
-      // target --->key ---->dep
-      let depsMap = targetMap.get(target)
-      if(!depsMap){
-          depsMap = new Map();
-          targetMap.set(target,depsMap);
-      }
-      let dep = depsMap.get(key);
-      if(!dep){
+export function track(target, key) {
+    // target --->key ---->dep
+    let depsMap = targetMap.get(target)
+    if (!depsMap) {
+        depsMap = new Map();
+        targetMap.set(target, depsMap);
+    }
+    let dep = depsMap.get(key);
+    if (!dep) {
         dep = new Set();
-        depsMap.set(key,dep)
-      }
-      dep.add(activeEffect)
+        depsMap.set(key, dep)
+    }
+    dep.add(activeEffect)
 }
 
 
-export function  trigger(target,key){
- let  depsMap = targetMap.get(target)
- let dep = depsMap.get(key)
- for (const effect of dep) {
+export function trigger(target, key) {
+    let depsMap = targetMap.get(target)
+    let dep = depsMap.get(key)
+    for (const effect of dep) {
         effect.run()
- }  
+    }
 }
 let activeEffect;
-export function effect(fn){
-    let  _effect = new ReactiveEffect(fn)
+export function effect(fn) {
+    let _effect = new ReactiveEffect(fn)
     _effect.run()
+    const runner = _effect.run.bind(_effect)
+    return runner
 }
