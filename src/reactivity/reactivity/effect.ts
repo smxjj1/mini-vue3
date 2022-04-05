@@ -2,6 +2,7 @@ class ReactiveEffect {
     private _fn: any
     public scheduler: Function | undefined
     deps = []
+    private active = true
     constructor(fn, scheduler?: Function) {
         this._fn = fn
         this.scheduler = scheduler
@@ -11,10 +12,19 @@ class ReactiveEffect {
         return this._fn();
     }
     stop() {
-        this.deps.forEach( (dep: any)=> {
-            dep.delete(this)
-        });
+        if (this.active) {
+            cleanUpEffect(this)
+            this.active = false;
+        }
     }
+}
+// 抽离stop中清空dep的功能函数
+function cleanUpEffect(effect) {
+    
+    effect.deps.forEach((dep: any) => {
+        dep.delete(effect)
+    });
+
 }
 const targetMap = new Map();
 export function track(target, key) {
