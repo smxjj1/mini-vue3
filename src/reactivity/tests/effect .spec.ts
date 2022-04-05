@@ -1,4 +1,4 @@
-import { effect } from "../reactivity/effect"
+import { effect,stop } from "../reactivity/effect"
 import { reactive } from "../reactivity/reactive"
 
 describe('effect', () => {
@@ -40,14 +40,14 @@ describe('effect', () => {
         // 4. 如果执行runner的时候，会再次执行fn
         let dummy;
         let run: any;
-        const scheduler = jest.fn(()=>{
+        const scheduler = jest.fn(() => {
             run = runner;
         });
-        const obj = reactive({foo:1});
-        const runner = effect(()=>{
+        const obj = reactive({ foo: 1 });
+        const runner = effect(() => {
             dummy = obj.foo;
         },
-        {scheduler}
+            { scheduler }
         );
         expect(scheduler).not.toHaveBeenCalled();
         expect(dummy).toBe(1);
@@ -60,6 +60,24 @@ describe('effect', () => {
         run();
         // should have run 
         expect(dummy).toBe(2)
+
+    })
+    // 实现stop的单测
+    it('stop', () => {
+        let dummy;
+        let obj = reactive({ prop: 1 });
+        let runner = effect(() => {
+            dummy = obj.prop;
+        });
+        obj.prop = 2;
+        expect(dummy).toBe(2)
+        // 当stop调用的时候,更新的对象不在改变
+        stop(runner);
+        obj.prop = 3;
+        expect(dummy).toBe(2)
+        //再次调用runner的时候
+        runner();
+        expect(dummy).toBe(3)
 
     })
 })
