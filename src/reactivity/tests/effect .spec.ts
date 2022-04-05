@@ -1,4 +1,4 @@
-import { effect,stop } from "../reactivity/effect"
+import { effect, stop } from "../reactivity/effect"
 import { reactive } from "../reactivity/reactive"
 
 describe('effect', () => {
@@ -84,5 +84,20 @@ describe('effect', () => {
         runner();
         expect(dummy).toBe(3)
 
+    })
+    // 实现onStop，当调用stop的时候就带上onStop的钩子函数
+    it('onStop', () => {
+        let obj = reactive({
+            foo: 1
+        });
+        const onStop = jest.fn();
+        let dummy;
+        let runner = effect(() => {
+            dummy = obj.foo
+        }, {
+            onStop,
+        });
+        stop(runner);
+        expect(onStop).toBeCalledTimes(1)
     })
 })
