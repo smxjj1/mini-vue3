@@ -13,4 +13,12 @@ describe('readonly', () => {
         expect(wrapped.foo).toBe(1)
 
     })
+    it('warn when call set function', () => {
+        console.warn = jest.fn()
+        let original = readonly({
+            age:10
+        })
+        original.foo = 112
+        expect(console.warn).toBeCalled()
+    })
 })
