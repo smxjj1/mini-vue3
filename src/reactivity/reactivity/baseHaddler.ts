@@ -9,6 +9,12 @@ function createGetter(isReadonly = false) {
         if (!isReadonly) {
             track(target, key)
         }
+        if(key==='is_Reactive'){
+            return !isReadonly
+        }
+        if(key==='is_Readonly'){
+            return isReadonly
+        }
         return res
     }
 }

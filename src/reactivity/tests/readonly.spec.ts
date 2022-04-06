@@ -1,4 +1,4 @@
-import { readonly } from "../reactivity/reactive"
+import { isReadonly, readonly } from "../reactivity/reactive"
 
 describe('readonly', () => {
     it('happy path', () => {
@@ -11,6 +11,8 @@ describe('readonly', () => {
         let wrapped = readonly(original)
         expect(wrapped).not.toBe(original)
         expect(wrapped.foo).toBe(1)
+        expect(isReadonly(wrapped)).toBe(true)
+        expect(isReadonly(original)).toBe(false)
 
     })
     it('warn when call set function', () => {
