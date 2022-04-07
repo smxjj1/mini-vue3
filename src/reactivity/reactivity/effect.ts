@@ -41,7 +41,8 @@ function cleanUpEffect(effect) {
     effect.deps.forEach((dep: any) => {
         dep.delete(effect);
     });
-
+    //清空变量释放缓存
+    effect.deps.length = 0
 }
 const targetMap = new Map();
 export function track(target, key) {
@@ -60,7 +61,8 @@ export function track(target, key) {
         dep = new Set();
         depsMap.set(key, dep);
     }
-
+    // 看看 dep 之前有没有添加过，添加过的话 那么就不添加了
+    if(dep.has(activeEffect)) return
     dep.add(activeEffect);
     activeEffect.deps.push(dep);
 }
