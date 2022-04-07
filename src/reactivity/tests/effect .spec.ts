@@ -72,16 +72,21 @@ describe('effect', () => {
         obj.prop = 2;
         expect(dummy).toBe(2)
         // 当stop调用的时候,更新的对象不在改变
-        stop(runner);
-        stop(runner);
-        stop(runner);
-        stop(runner);
+        // stop(runner);
+        // stop(runner);
+        // stop(runner);
+        // stop(runner);
         stop(runner);
 
-        obj.prop = 3;
+        // obj.prop = 3;
+        obj.prop ++
+        // obj.prop = obj.prop + 1
         expect(dummy).toBe(2)
         //再次调用runner的时候
         runner();
+        expect(dummy).toBe(3)
+        // 不调用runner
+        obj.prop ++
         expect(dummy).toBe(3)
 
     })

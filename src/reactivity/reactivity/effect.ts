@@ -11,8 +11,15 @@ class ReactiveEffect {
         this.scheduler = scheduler;
     }
     run() {
+        if (!this.active) {
+            return this._fn();
+        }
         activeEffect = this;
-        return this._fn();
+        shouldTrack = true;
+        const r = this._fn();
+        // 重置shouldTrack
+        shouldTrack = false;
+        return r;
     }
     stop() {
         if (this.active) {
@@ -46,7 +53,8 @@ export function track(target, key) {
         dep = new Set();
         depsMap.set(key, dep);
     }
-    if(!activeEffect) return
+    if (!activeEffect) return
+    if (!shouldTrack) return
     dep.add(activeEffect);
     activeEffect.deps.push(dep);
 }
@@ -65,13 +73,14 @@ export function trigger(target, key) {
     }
 }
 let activeEffect;
+let shouldTrack = false;
 type effectOptions = {
     scheduler?: Function
     onStop?: Function
 }
 export function effect(fn, options: effectOptions = {}) {
     let _effect = new ReactiveEffect(fn, options.scheduler)
-   extend(_effect, options)
+    extend(_effect, options)
     _effect.run()
     const runner: any = _effect.run.bind(_effect)
     runner.effect = _effect;
