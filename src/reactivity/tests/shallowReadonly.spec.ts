@@ -1,4 +1,4 @@
-import { isReadonly, shallowReadonly } from "../reactivity/reactive";
+import { isReadonly, shallowReadonly } from "../src/reactive";
 
 describe('shallowReadonly', () => {
     test('should not make nested object item to be reactive', () => {
