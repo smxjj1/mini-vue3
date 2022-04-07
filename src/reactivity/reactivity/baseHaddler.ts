@@ -1,4 +1,4 @@
-import { isObject } from "../../share";
+import { extend, isObject } from "../../share";
 import { track, trigger } from "./effect";
 import { reactive, ReactiveFlags, readonly } from "./reactive";
 const get = createGetter()
@@ -52,11 +52,15 @@ export const readonlyHadlers = {
         return true
     }
 }
-export const shallowReadonlyHadlers = {
-    get: shallowReadonlyGet,
-    set(target, key, value) {
-        // can not set 
-        console.warn(`key:${key} set 失败 readonly 条件下${target}不能重新赋值`)
-        return true
-    }
-}
+// export const shallowReadonlyHadlers = {
+//     get: shallowReadonlyGet,
+//     set(target, key, value) {
+//         // can not set 
+//         console.warn(`key:${key} set 失败 readonly 条件下${target}不能重新赋值`)
+//         return true
+//     }
+// }
+
+export const shallowReadonlyHadlers = extend({}, readonlyHadlers, {
+    get: shallowReadonlyGet
+})
