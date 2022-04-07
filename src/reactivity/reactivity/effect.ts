@@ -1,5 +1,7 @@
 import { extend } from "../../share"
-
+// 变量统一到顶部
+let activeEffect;
+let shouldTrack = false;
 class ReactiveEffect {
     private _fn: any
     public scheduler: Function | undefined
@@ -11,6 +13,7 @@ class ReactiveEffect {
         this.scheduler = scheduler;
     }
     run() {
+        // stop走这个逻辑
         if (!this.active) {
             return this._fn();
         }
@@ -43,6 +46,10 @@ function cleanUpEffect(effect) {
 const targetMap = new Map();
 export function track(target, key) {
     // target --->key ---->dep
+    // 重构优化这两个判断
+    // if (!activeEffect) return
+    // if (!shouldTrack) return
+    if (!isTracking()) return;
     let depsMap = targetMap.get(target)
     if (!depsMap) {
         depsMap = new Map();
@@ -53,12 +60,13 @@ export function track(target, key) {
         dep = new Set();
         depsMap.set(key, dep);
     }
-    if (!activeEffect) return
-    if (!shouldTrack) return
+
     dep.add(activeEffect);
     activeEffect.deps.push(dep);
 }
-
+function isTracking() {
+    return shouldTrack && activeEffect !== undefined;
+}
 
 export function trigger(target, key) {
     let depsMap = targetMap.get(target);
@@ -72,8 +80,7 @@ export function trigger(target, key) {
 
     }
 }
-let activeEffect;
-let shouldTrack = false;
+
 type effectOptions = {
     scheduler?: Function
     onStop?: Function
