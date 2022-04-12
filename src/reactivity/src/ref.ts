@@ -3,35 +3,41 @@ import { isTracking, trackEffects, triggerEffects } from "./effect";
 import { reactive } from "./reactive";
 
 class RefImpl {
-    private _value: any;
-    public dep;
-    private _rawValue: any;
-    constructor(value) {
-        this._rawValue = value;
-        this._value =convert(value);
-        this.dep = new Set();
+  private _value: any;
+  public dep;
+  private _rawValue: any;
+  public _v_isRef = true;
+  constructor(value) {
+    this._rawValue = value;
+    this._value = convert(value);
+    this.dep = new Set();
+  }
+  get value() {
+    trackRefValue(this);
+    return this._value;
+  }
+  set value(newValue) {
+    if (hasChanged(newValue, this._rawValue)) {
+      this._rawValue = newValue;
+      this._value = convert(newValue);
+      triggerEffects(this.dep);
     }
-    get value() {
-
-        trackRefValue(this);
-        return this._value;
-    }
-    set value(newValue) {
-        if (hasChanged(this._value, newValue)) {
-            this._rawValue = newValue;
-            this._value = convert(newValue);
-            triggerEffects(this.dep);
-        }
-    }
+  }
 }
 export function ref(value: any) {
-    return new RefImpl(value);
+  return new RefImpl(value);
 }
 function trackRefValue(ref) {
-    if (isTracking()) {
-        trackEffects(ref.dep);
-    };
-}
-function convert(value) {
-    return isObject(value) ? reactive(value) : value;
+  if (isTracking()) {
+    trackEffects(ref.dep);
   }
+}
+function convert(ref) {
+  return isObject(ref) ? reactive(ref) : ref;
+}
+export function isRef(ref) {
+  return !!ref._v_isRef;
+}
+export function unRef(ref) {
+  return isRef(ref) ? ref.value : ref;
+}
