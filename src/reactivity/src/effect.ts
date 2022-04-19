@@ -2,7 +2,7 @@ import { extend } from "../../share"
 // 变量统一到顶部
 let activeEffect;
 let shouldTrack = false;
-class ReactiveEffect {
+export class ReactiveEffect {
     private _fn: any
     public scheduler: Function | undefined
     deps = []
