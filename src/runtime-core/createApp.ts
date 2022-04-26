@@ -26,7 +26,7 @@ function queryContainer(rootContainer) {
           );
         };
   if (typeof rootContainer === "string") {
-    document.querySelector("rootContainer");
+   return document.querySelector(rootContainer);
   } else if (isDOM(rootContainer)) {
     return rootContainer;
   } else {
