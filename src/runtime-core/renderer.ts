@@ -1,4 +1,4 @@
-import { isObject } from "../share/index";
+import { isObject, isOn } from "../share/index";
 import { ShapeFlags } from "../share/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 import { createVNode } from "./vnode";
@@ -45,8 +45,14 @@ function mountElement(vnode: any, container: any) {
   const { children, props, shapeFlag } = vnode;
   for (const key in props) {
     if (Object.prototype.hasOwnProperty.call(props, key)) {
-      const element = props[key];
-      el.setAttribute(key, element);
+      const val = props[key];
+      debugger
+      if (isOn(key)) {
+        const event = key.slice(2).toLowerCase();
+        el.addEventListener(event, val);
+      } else {
+        el.setAttribute(key, val);
+      }
     }
   }
   //children can be string or object

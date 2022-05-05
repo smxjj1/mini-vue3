@@ -9,9 +9,9 @@ export function createVNode(type, props?, children?) {
     el: null,
   };
   if (typeof children === "string") {
-    vnode.shapeFlag != ShapeFlags.TEXT_CHILDREN;
+    vnode.shapeFlag |= ShapeFlags.TEXT_CHILDREN;
   } else if (Array.isArray(children)) {
-    vnode.shapeFlag != ShapeFlags.ARRAY_CHILDREN;
+    vnode.shapeFlag |= ShapeFlags.ARRAY_CHILDREN;
   }
   return vnode;
 }
