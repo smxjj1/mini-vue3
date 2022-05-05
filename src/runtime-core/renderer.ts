@@ -1,7 +1,7 @@
-import { isObject, isOn } from "../share/index";
+import {  isOn } from "../share/index";
 import { ShapeFlags } from "../share/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
-import { createVNode } from "./vnode";
+
 
 export function render(vnode, container) {
   patch(vnode, container);
@@ -46,7 +46,7 @@ function mountElement(vnode: any, container: any) {
   for (const key in props) {
     if (Object.prototype.hasOwnProperty.call(props, key)) {
       const val = props[key];
-      debugger
+      
       if (isOn(key)) {
         const event = key.slice(2).toLowerCase();
         el.addEventListener(event, val);
