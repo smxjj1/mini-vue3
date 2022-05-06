@@ -10,8 +10,8 @@ export const App = {
       Foo,
       {},
       {
-        header: h("p", {}, "header"),
-        footer: h("h2", {}, "footer"),
+        header: ({ age }) => h("p", {}, "header " + age),
+        footer: ({ name }) => h("h2", {}, "footer " + name),
       }
     );
     // const foo = h(Foo, {}, h("p", {}, "123"));

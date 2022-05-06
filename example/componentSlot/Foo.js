@@ -7,10 +7,12 @@ export const Foo = {
     const foo = h("p", {}, "foo");
     console.log(this.$slots, "this.$slots this");
     // return h("div", {}, [foo, h("div", {}, this.$slots)]);
+    let age = 18;
+    let name = "lilith";
     return h("div", {}, [
-      renderSlots(this.$slots, "header"),
+      renderSlots(this.$slots, "header", { age }),
       foo,
-      renderSlots(this.$slots, "footer"),
+      renderSlots(this.$slots, "footer", { name }),
     ]);
   },
 };
