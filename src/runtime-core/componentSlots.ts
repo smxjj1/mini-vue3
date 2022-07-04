@@ -3,7 +3,7 @@ import { ShapeFlags } from "../share/ShapeFlags";
 export function initSlots(instance, children) {
   // instance.slots = Array.isArray(children) ? children : [children];
   const { vnode } = instance;
-  if (vnode.shapeFlag & ShapeFlags.SLOT_CHIlDREN) {
+  if (vnode.shapeFlag & ShapeFlags.SLOT_CHILDREN) {
     normalizeObjectSlots(children, instance.slots);
   }
 }

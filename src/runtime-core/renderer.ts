@@ -1,4 +1,4 @@
-import { isOn } from "../share/index";
+
 import { ShapeFlags } from "../share/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 import { Fragment, Text } from "./vnode";
@@ -6,9 +6,10 @@ import { Fragment, Text } from "./vnode";
 export function render(vnode, container) {
   patch(vnode, container);
 }
-function patch(vnode: any, container: any) {
-  // TODO 判断vnode是不是一个element类型
+
+function patch(vnode, container) {
   const { type, shapeFlag } = vnode;
+
   switch (type) {
     case Fragment:
       processFragment(vnode, container);
@@ -16,77 +17,81 @@ function patch(vnode: any, container: any) {
     case Text:
       processText(vnode, container);
       break;
+
     default:
-      if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-        processComponent(vnode, container);
-      } else if (shapeFlag & ShapeFlags.ELEMENT) {
+      if (shapeFlag & ShapeFlags.ELEMENT) {
         processElement(vnode, container);
+      } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+        processComponent(vnode, container);
       }
       break;
   }
 }
+
+function processText(vnode: any, container: any) {
+  const { children } = vnode;
+  const textNode = (vnode.el = document.createTextNode(children));
+  container.append(textNode);
+}
+
 function processFragment(vnode: any, container: any) {
   mountChildren(vnode, container);
 }
+
+function processElement(vnode: any, container: any) {
+  mountElement(vnode, container);
+}
+
+function mountElement(vnode: any, container: any) {
+  const el = (vnode.el = document.createElement(vnode.type));
+
+  const { children, shapeFlag } = vnode;
+
+  // children
+  if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+    el.textContent = children;
+  } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+    mountChildren(vnode, el);
+  }
+
+  // props
+  const { props } = vnode;
+  for (const key in props) {
+    const val = props[key];
+    const isOn = (key: string) => /^on[A-Z]/.test(key);
+    if (isOn(key)) {
+      const event = key.slice(2).toLowerCase();
+      el.addEventListener(event, val);
+    } else {
+      el.setAttribute(key, val);
+    }
+  }
+
+  container.append(el);
+}
+
 function mountChildren(vnode, container) {
-  vnode.children.forEach(function (v) {
+  vnode.children.forEach((v) => {
     patch(v, container);
   });
 }
+
 function processComponent(vnode: any, container: any) {
   mountComponent(vnode, container);
 }
 
-function mountComponent(vnode: any, container: any) {
-  const instance = createComponentInstance(vnode);
+function mountComponent(initialVNode: any, container) {
+  const instance = createComponentInstance(initialVNode);
+
   setupComponent(instance);
-  setupRenderEffect(instance, vnode, container);
+  setupRenderEffect(instance, initialVNode, container);
 }
-function setupRenderEffect(instance: any, vnode, container) {
+
+function setupRenderEffect(instance: any, initialVNode, container) {
   const { proxy } = instance;
-  // bind 和call的不同写法
-  // let proxyRender = instance.render.bind(proxy);
-  // const subTree = proxyRender();
   const subTree = instance.render.call(proxy);
 
   patch(subTree, container);
-  vnode.el = subTree.el;
-}
 
-function processElement(vnode, container) {
-  mountElement(vnode, container);
-}
-function mountElement(vnode: any, container: any) {
-  //仅仅是type是element的时候赋值，
-  const el = (vnode.el = document.createElement(vnode.type));
-  const { children, props, shapeFlag } = vnode;
-  for (const key in props) {
-    if (Object.prototype.hasOwnProperty.call(props, key)) {
-      const val = props[key];
-
-      if (isOn(key)) {
-        const event = key.slice(2).toLowerCase();
-        el.addEventListener(event, val);
-      } else {
-        el.setAttribute(key, val);
-      }
-    }
-  }
-  //children can be string or object
-  if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
-    el.textContent = children;
-  } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-    children.forEach((v) => {
-      patch(v, el);
-    });
-  }
-
-  //TODO handle object children
-
-  container.append(el);
-}
-function processText(vnode: any, container: any) {
-  const { children } = vnode;
-  const textVnode = (vnode.el = document.createTextNode(children));
-  container.append(textVnode);
+  initialVNode.el = subTree.el;
 }
