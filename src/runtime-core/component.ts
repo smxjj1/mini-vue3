@@ -19,7 +19,7 @@ export function createComponentInstance(vnode) {
 
 export function setupComponent(instance) {
   // TODO
-  
+
   initProps(instance, instance.vnode.props);
   initSlots(instance, instance.vnode.children);
   setupStatefulComponent(instance);
@@ -29,10 +29,12 @@ function setupStatefulComponent(instance: any) {
   const Component = instance.type;
   instance.proxy = new Proxy({ _: instance }, PublicInstanceProxyHandlers);
   const { setup } = Component;
+  setCurrentInstance(instance);
   if (setup) {
     const setupResult = setup(shallowReadonly(instance.props), {
       emit: instance.emit,
     });
+    setCurrentInstance(null);
     handleSetupResult(instance, setupResult);
   }
 }
@@ -45,4 +47,12 @@ function handleSetupResult(instance: any, setupResult: any) {
 function finishComponentSetup(instance: any) {
   const Component = instance.type;
   instance.render = Component.render;
+}
+let currentInstance = null;
+export function getCurrentInstance() {
+  return currentInstance;
+}
+
+function setCurrentInstance(instance) {
+  currentInstance = instance;
 }
