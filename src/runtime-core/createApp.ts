@@ -1,13 +1,14 @@
-import { render } from "./renderer";
 import { createVNode } from "./vnode";
 
-export function createApp(rootComponent) {
-  return {
-    mount(rootContainer) {
-      let finalRootContainer = queryContainer(rootContainer)
-      const vnode = createVNode(rootComponent);
-      render(vnode, finalRootContainer);
-    },
+export function createAppApi(render) {
+  return function createApp(rootComponent) {
+    return {
+      mount(rootContainer) {
+        let finalRootContainer = queryContainer(rootContainer);
+        const vnode = createVNode(rootComponent);
+        render(vnode, finalRootContainer);
+      },
+    };
   };
 }
 
@@ -26,7 +27,7 @@ function queryContainer(rootContainer) {
           );
         };
   if (typeof rootContainer === "string") {
-   return document.querySelector(rootContainer);
+    return document.querySelector(rootContainer);
   } else if (isDOM(rootContainer)) {
     return rootContainer;
   } else {
