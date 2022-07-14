@@ -1,6 +1,6 @@
 import { ShapeFlags } from "../share/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
-import { createAppApi } from "./createApp";
+import { createAppAPI } from "./createApp";
 import { Fragment, Text } from "./vnode";
 
 export function createRenderer(options) {
@@ -100,6 +100,6 @@ export function createRenderer(options) {
     initialVNode.el = subTree.el;
   }
   return {
-    createApp: createAppApi(render),
+    createApp: createAppAPI(render),
   };
 }

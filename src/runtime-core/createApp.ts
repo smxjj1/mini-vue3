@@ -1,6 +1,6 @@
 import { createVNode } from "./vnode";
 
-export function createAppApi(render) {
+export function createAppAPI(render) {
   return function createApp(rootComponent) {
     return {
       mount(rootContainer) {
@@ -28,9 +28,8 @@ function queryContainer(rootContainer) {
         };
   if (typeof rootContainer === "string") {
     return document.querySelector(rootContainer);
-  } else if (isDOM(rootContainer)) {
-    return rootContainer;
   } else {
-    throw new Error("输入的跟组件必须为一个id或者具体的element元素");
+    // 返回一个dom元素或者canvas元素
+    return rootContainer;
   }
 }
